@@ -4,11 +4,15 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.example.geeknews.GreenDao.DaoSession;
 import com.example.geeknews.GreenDao.MyappNews;
+import com.example.geeknews.GreenDao.NewsDao;
+import com.example.geeknews.GreenDao.NewsDaoDao;
 import com.example.geeknews.R;
+import com.example.geeknews.Xi_Fragment;
 import com.example.geeknews.jiekou.ItemCallBack;
 
 import java.util.ArrayList;
@@ -37,8 +41,23 @@ public class MyadaperRecyc_Xi extends RecyclerView.Adapter implements ItemCallBa
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
         ShouYeItem shouYeItem = (ShouYeItem) holder;
+
+        NewsDao newsDao = daoSession.queryBuilder(NewsDao.class).where(NewsDaoDao.Properties.MPosition.eq(position + "")).build().unique();
+        shouYeItem.swi.setChecked(newsDao.getChecked());
+
+        shouYeItem.swi.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                NewsDao newsDao1 = new NewsDao();
+                newsDao1.setId((long) (position+1));
+                newsDao1.setTitle(Xi_Fragment.Tabs[position]);
+                newsDao1.setChecked(isChecked);
+                newsDao1.setMPosition(position);
+                daoSession.update(newsDao1);
+            }
+        });
         shouYeItem.tv.setText(list.get(position));
         shouYeItem.swi.setChecked(true);
     }
@@ -52,6 +71,8 @@ public class MyadaperRecyc_Xi extends RecyclerView.Adapter implements ItemCallBa
     public void moveItem(int fromPosition, int toPosition) {
         Collections.swap(list,fromPosition,toPosition);
         notifyItemMoved(fromPosition,toPosition);
+
+
     }
 
     @Override

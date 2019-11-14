@@ -45,7 +45,7 @@ public class BaseApp extends Application {
                     newsDao.setChecked(false);
                     break;
             }
-            newsDaoDao.insert(newsDao);
+            newsDaoDao.insertOrReplace(newsDao);
         }
     }
 
